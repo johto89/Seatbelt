@@ -443,30 +443,69 @@ Runs privilege escalation checks integrated from [SharpUp](https://github.com/Gh
 
 Executed with: `Seatbelt.exe -group=privesc`
 
-| Command | Description |
-| ----------- | ----------- |
-| SharpUpAlwaysInstallElevated | Checks AlwaysInstallElevated registry keys (HKLM + HKCU) |
-| SharpUpCachedGPPPassword | Finds cached Group Policy Preference passwords |
-| SharpUpCOMHijack | Checks for COM objects vulnerable to HKCU hijacking |
-| SharpUpCredentialFiles | Hunts cleartext credentials in web.config, appsettings.json, .ini, script files |
-| SharpUpDomainGPPPassword | Finds domain SYSVOL Group Policy Preference passwords |
-| SharpUpHijackablePaths | Checks system PATH directories for modifiable folders |
-| SharpUpMcAfeeSitelistFiles | Finds McAfee SiteList.xml files |
-| SharpUpModifiableScheduledTaskFile | Checks for writable scheduled task files and task binaries |
-| SharpUpModifiableServiceBinaries | Checks for modifiable service binary paths |
-| SharpUpModifiableServiceRegistryKeys | Checks for modifiable service registry keys |
-| SharpUpModifiableServices | Checks for services with modifiable DACLs (ChangeConfig, WriteDac, etc.) |
-| SharpUpPrintSpooler | Checks Print Spooler status and Point-and-Print config (PrintNightmare/SpoolFool) |
-| SharpUpProcessDLLHijack | Checks for DLL hijack opportunities in running processes (non-KnownDLL, writable) |
-| SharpUpRegistryAutoLogons | Checks Winlogon registry for autologon credentials |
-| SharpUpRegistryAutoruns | Checks 8 autorun registry locations for modifiable binaries |
-| SharpUpShadowCopies | Lists volume shadow copies and checks if SAM/SYSTEM/SECURITY/ntds.dit are accessible |
-| SharpUpTokenPrivileges | Enumerates abusable token privileges (SeImpersonate, SeDebug, SeBackup, etc.) |
-| SharpUpUnattendedInstallFiles | Checks for unattended installation files (sysprep, Panther, etc.) |
-| SharpUpUnquotedServicePath | Checks for unquoted service paths with spaces |
-| SharpUpWSUSConfig | Checks if WSUS is configured over HTTP (WSUSPect/SharpWSUS attack surface) |
-| SharpUpWritableServiceDir | Checks for writable service binary directories (DLL side-loading) |
-| SharpUpWritableShares | Checks common shared/ProgramData directories for write access |
+Each check is classified by severity based on real-world exploitation impact. Use `-Severity=critical,high` to filter output.
+
+**CRITICAL** — Direct privilege escalation to SYSTEM, single-step exploit:
+
+| Command | Severity | Description |
+| ----------- | ----------- | ----------- |
+| SharpUpAlwaysInstallElevated | CRITICAL | Checks AlwaysInstallElevated registry keys (HKLM + HKCU) |
+| SharpUpCachedGPPPassword | CRITICAL | Finds cached Group Policy Preference passwords |
+| SharpUpDomainGPPPassword | CRITICAL | Finds domain SYSVOL Group Policy Preference passwords |
+| SharpUpModifiableServiceBinaries | CRITICAL | Checks for modifiable service binary paths |
+| SharpUpModifiableServices | CRITICAL | Checks for services with modifiable DACLs (ChangeConfig, WriteDac, etc.) |
+| SharpUpRegistryAutoLogons | CRITICAL | Checks Winlogon registry for autologon credentials |
+
+**HIGH** — Reliable privilege escalation, requires additional steps:
+
+| Command | Severity | Description |
+| ----------- | ----------- | ----------- |
+| SharpUpModifiableScheduledTaskFile | HIGH | Checks for writable scheduled task files and task binaries |
+| SharpUpModifiableServiceRegistryKeys | HIGH | Checks for modifiable service registry keys |
+| SharpUpShadowCopies | HIGH | Lists volume shadow copies and checks if SAM/SYSTEM/SECURITY/ntds.dit are accessible |
+| SharpUpTokenPrivileges | HIGH | Enumerates abusable token privileges (SeImpersonate, SeDebug, SeBackup, etc.) |
+| SharpUpUnquotedServicePath | HIGH | Checks for unquoted service paths with spaces |
+| SharpUpWritableServiceDir | HIGH | Checks for writable service binary directories (DLL side-loading) |
+
+**MEDIUM** — Conditional exploitation or lateral movement:
+
+| Command | Severity | Description |
+| ----------- | ----------- | ----------- |
+| SharpUpCOMHijack | MEDIUM | Checks for COM objects vulnerable to HKCU hijacking |
+| SharpUpCredentialFiles | MEDIUM | Hunts cleartext credentials in web.config, appsettings.json, .ini, script files |
+| SharpUpHijackablePaths | MEDIUM | Checks system PATH directories for modifiable folders |
+| SharpUpMcAfeeSitelistFiles | MEDIUM | Finds McAfee SiteList.xml files |
+| SharpUpProcessDLLHijack | MEDIUM | Checks for DLL hijack opportunities in running processes (non-KnownDLL, writable) |
+| SharpUpRegistryAutoruns | MEDIUM | Checks 8 autorun registry locations for modifiable binaries |
+
+**LOW** — Informational, requires significant additional work:
+
+| Command | Severity | Description |
+| ----------- | ----------- | ----------- |
+| SharpUpPrintSpooler | LOW | Checks Print Spooler status and Point-and-Print config (PrintNightmare/SpoolFool) |
+| SharpUpUnattendedInstallFiles | LOW | Checks for unattended installation files (sysprep, Panther, etc.) |
+| SharpUpWSUSConfig | LOW | Checks if WSUS is configured over HTTP (WSUSPect/SharpWSUS attack surface) |
+| SharpUpWritableShares | LOW | Checks common shared/ProgramData directories for write access |
+
+#### Severity Filtering
+
+Filter output to show only the most critical findings:
+
+```
+# Show only CRITICAL findings
+Seatbelt.exe -group=privesc -Severity=critical
+
+# Show CRITICAL and HIGH findings (recommended for quick triage)
+Seatbelt.exe -group=privesc -Severity=critical,high
+
+# Show CRITICAL, HIGH, and MEDIUM findings
+Seatbelt.exe -group=privesc -Severity=critical,high,medium
+
+# Save full output to file, show only critical on screen
+Seatbelt.exe -group=privesc -Severity=critical,high -OutputFile=full_results.txt
+```
+
+Output is automatically sorted by severity (Critical first) and ends with a summary showing finding counts per level.
 
 
 ### Additional Command Groups
