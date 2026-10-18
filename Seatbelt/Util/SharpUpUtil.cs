@@ -335,7 +335,7 @@ namespace Seatbelt.Util
 
         internal static bool IsLocalAdmin()
         {
-            string[] sids = GetTokenGroupSIDs();
+            string[]? sids = GetTokenGroupSIDs();
             if (sids == null) return false;
             foreach (string sid in sids)
             {
