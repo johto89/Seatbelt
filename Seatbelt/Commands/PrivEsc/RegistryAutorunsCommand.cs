@@ -32,6 +32,7 @@ namespace Seatbelt.Commands.PrivEsc
 
         public override IEnumerable<CommandDTOBase?> Execute(string[] args)
         {
+            var results = new List<CommandDTOBase?>();
             foreach (string autorunLocation in AutorunLocations)
             {
                 try
@@ -50,12 +51,12 @@ namespace Seatbelt.Commands.PrivEsc
 
                         if (!string.IsNullOrEmpty(binaryPath) && SharpUpUtil.CheckModifiableAccess(binaryPath))
                         {
-                            yield return new RegistryAutorunDTO
+                            results.Add(new RegistryAutorunDTO
                             {
                                 RegistryKey = "HKLM:\\" + autorunLocation,
                                 BinaryPath = binaryPath,
                                 IsVulnerable = true
-                            };
+                            });
                         }
                     }
                 }
@@ -64,6 +65,8 @@ namespace Seatbelt.Commands.PrivEsc
                     // access denied - skip
                 }
             }
+
+            foreach (var r in results) yield return r;
         }
 
         internal class RegistryAutorunDTO : CommandDTOBase

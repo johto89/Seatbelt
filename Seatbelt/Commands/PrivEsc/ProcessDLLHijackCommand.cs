@@ -43,6 +43,7 @@ namespace Seatbelt.Commands.PrivEsc
 
             Process[] processes = Process.GetProcesses();
 
+            var results = new List<CommandDTOBase?>();
             foreach (Process process in processes)
             {
                 try
@@ -61,14 +62,14 @@ namespace Seatbelt.Commands.PrivEsc
                         {
                             bool isProgramFiles = filepath.Contains("c:\\program files");
 
-                            yield return new ProcessDLLHijackDTO
+                            results.Add(new ProcessDLLHijackDTO
                             {
                                 DllPath = module.FileName,
                                 ProcessName = process.ProcessName,
                                 ProcessId = process.Id,
                                 IsProgramFiles = isProgramFiles,
                                 IsVulnerable = true
-                            };
+                            });
                         }
                     }
                 }
@@ -77,6 +78,8 @@ namespace Seatbelt.Commands.PrivEsc
                     // access denied - skip
                 }
             }
+
+            foreach (var r in results) yield return r;
         }
 
         internal class ProcessDLLHijackDTO : CommandDTOBase

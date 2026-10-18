@@ -46,6 +46,7 @@ namespace Seatbelt.Commands.PrivEsc
             {
                 bool taskPerms = SharpUpUtil.CheckAccess(file, FileSystemRights.Write);
 
+                var results = new List<CommandDTOBase?>();
                 try
                 {
                     XmlDocument xmlDocument = new XmlDocument();
@@ -61,7 +62,7 @@ namespace Seatbelt.Commands.PrivEsc
                         if (binPerms || taskPerms)
                         {
                             string taskName = (task.Count > 0) ? task[0].InnerXml : "(unknown)";
-                            yield return new ModifiableScheduledTaskDTO
+                            results.Add(new ModifiableScheduledTaskDTO
                             {
                                 TaskName = taskName,
                                 TaskPath = file,
@@ -69,7 +70,7 @@ namespace Seatbelt.Commands.PrivEsc
                                 TaskXmlModifiable = taskPerms,
                                 TaskBinaryModifiable = binPerms,
                                 IsVulnerable = true
-                            };
+                            });
                         }
                     }
                 }
@@ -77,6 +78,8 @@ namespace Seatbelt.Commands.PrivEsc
                 {
                     // not a valid XML task file - skip
                 }
+
+                foreach (var r in results) yield return r;
             }
         }
 

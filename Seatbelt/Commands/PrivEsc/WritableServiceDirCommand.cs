@@ -24,6 +24,7 @@ namespace Seatbelt.Commands.PrivEsc
         {
             var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             ManagementObjectSearcher wmiData = null;
+            var results = new List<CommandDTOBase?>();
 
             try
             {
@@ -60,7 +61,7 @@ namespace Seatbelt.Commands.PrivEsc
                     if (!SharpUpUtil.CheckModifiableAccess(binaryPath) &&
                         SharpUpUtil.CheckModifiableAccess(dir))
                     {
-                        yield return new WritableServiceDirDTO
+                        results.Add(new WritableServiceDirDTO
                         {
                             ServiceName = result["Name"]?.ToString() ?? "(unknown)",
                             State = result["State"]?.ToString() ?? "(unknown)",
@@ -68,7 +69,7 @@ namespace Seatbelt.Commands.PrivEsc
                             BinaryPath = binaryPath,
                             WritableDir = dir,
                             IsVulnerable = true
-                        };
+                        });
                     }
                 }
             }
@@ -80,6 +81,8 @@ namespace Seatbelt.Commands.PrivEsc
             {
                 wmiData?.Dispose();
             }
+
+            foreach (var r in results) yield return r;
         }
 
         internal class WritableServiceDirDTO : CommandDTOBase

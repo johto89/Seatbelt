@@ -26,6 +26,7 @@ namespace Seatbelt.Commands.PrivEsc
                 yield break;
             }
 
+            var results = new List<CommandDTOBase?>();
             try
             {
                 if (!allUsers.Contains("ProgramData"))
@@ -46,12 +47,12 @@ namespace Seatbelt.Commands.PrivEsc
 
                     if (SharpUpUtil.ParseGPPPasswordFromXml(file, out SharpUpUtil.GPPPassword result))
                     {
-                        yield return new CachedGPPPasswordDTO
+                        results.Add(new CachedGPPPasswordDTO
                         {
                             FilePath = file,
                             Details = result.ToString(),
                             IsVulnerable = true
-                        };
+                        });
                     }
                 }
             }
@@ -59,6 +60,8 @@ namespace Seatbelt.Commands.PrivEsc
             {
                 WriteError(string.Format("  [X] Exception: {0}", ex.Message));
             }
+
+            foreach (var r in results) yield return r;
         }
 
         internal class CachedGPPPasswordDTO : CommandDTOBase

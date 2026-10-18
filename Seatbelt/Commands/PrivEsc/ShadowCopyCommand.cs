@@ -30,6 +30,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override IEnumerable<CommandDTOBase?> Execute(string[] args)
         {
             ManagementObjectSearcher wmiData = null;
+            var results = new List<CommandDTOBase?>();
             try
             {
                 wmiData = new ManagementObjectSearcher(@"root\cimv2",
@@ -62,14 +63,14 @@ namespace Seatbelt.Commands.PrivEsc
                         catch { }
                     }
 
-                    yield return new ShadowCopyDTO
+                    results.Add(new ShadowCopyDTO
                     {
                         DeviceObject = deviceObj,
                         InstallDate = installDate,
                         VolumeName = volumeName,
                         AccessibleHives = accessibleHives,
                         IsVulnerable = accessibleHives.Count > 0
-                    };
+                    });
                 }
             }
             catch (Exception ex)
@@ -80,6 +81,8 @@ namespace Seatbelt.Commands.PrivEsc
             {
                 wmiData?.Dispose();
             }
+
+            foreach (var r in results) yield return r;
         }
 
         internal class ShadowCopyDTO : CommandDTOBase

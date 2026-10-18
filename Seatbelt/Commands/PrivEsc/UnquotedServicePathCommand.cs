@@ -26,6 +26,7 @@ namespace Seatbelt.Commands.PrivEsc
                 yield break;
             }
 
+            var results = new List<CommandDTOBase?>();
             foreach (string subkey in services.GetSubKeyNames())
             {
                 try
@@ -70,14 +71,14 @@ namespace Seatbelt.Commands.PrivEsc
 
                             if (SharpUpUtil.CheckModifiableAccess(checkPath, true))
                             {
-                                yield return new UnquotedServicePathDTO
+                                results.Add(new UnquotedServicePathDTO
                                 {
                                     ServiceName = subkey,
                                     StartMode = startType,
                                     ImagePath = path,
                                     ModifiablePath = newPath,
                                     IsVulnerable = true
-                                };
+                                });
                                 break; // one finding per service is enough
                             }
                         }
@@ -88,6 +89,8 @@ namespace Seatbelt.Commands.PrivEsc
                     // access denied - skip
                 }
             }
+
+            foreach (var r in results) yield return r;
         }
 
         internal class UnquotedServicePathDTO : CommandDTOBase

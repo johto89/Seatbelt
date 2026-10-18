@@ -41,6 +41,8 @@ namespace Seatbelt.Commands.PrivEsc
                 drive + @"\Windows\System32\Tasks",
             };
 
+            var results = new List<CommandDTOBase?>();
+
             foreach (string dir in dirsToCheck)
             {
                 if (!Directory.Exists(dir)) continue;
@@ -52,13 +54,13 @@ namespace Seatbelt.Commands.PrivEsc
 
                     if (writable || createFiles)
                     {
-                        yield return new WritableShareDTO
+                        results.Add(new WritableShareDTO
                         {
                             Path = dir,
                             CanWrite = writable,
                             CanCreateFiles = createFiles,
                             IsVulnerable = true
-                        };
+                        });
                     }
                 }
                 catch { }
@@ -96,14 +98,14 @@ namespace Seatbelt.Commands.PrivEsc
 
                                 if (hasExecutables)
                                 {
-                                    yield return new WritableShareDTO
+                                    results.Add(new WritableShareDTO
                                     {
                                         Path = subDir,
                                         CanWrite = true,
                                         CanCreateFiles = true,
                                         HasExecutables = true,
                                         IsVulnerable = true
-                                    };
+                                    });
                                 }
                             }
                         }
@@ -112,6 +114,8 @@ namespace Seatbelt.Commands.PrivEsc
                 }
                 catch { }
             }
+
+            foreach (var r in results) yield return r;
         }
 
         internal class WritableShareDTO : CommandDTOBase

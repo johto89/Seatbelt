@@ -51,6 +51,7 @@ namespace Seatbelt.Commands.PrivEsc
                 SharpUpNative.ServiceAccessRights.AllAccess
             };
 
+            var results = new List<CommandDTOBase?>();
             foreach (ServiceController sc in scServices)
             {
                 try
@@ -106,13 +107,13 @@ namespace Seatbelt.Commands.PrivEsc
 
                                         foreach (ManagementObject result in data)
                                         {
-                                            yield return new ModifiableServiceDTO
+                                            results.Add(new ModifiableServiceDTO
                                             {
                                                 ServiceName = result["Name"]?.ToString() ?? sc.ServiceName,
                                                 State = result["State"]?.ToString() ?? "(unknown)",
                                                 StartMode = result["StartMode"]?.ToString() ?? "(unknown)",
                                                 IsVulnerable = true
-                                            };
+                                            });
                                         }
                                     }
                                     finally
@@ -130,6 +131,8 @@ namespace Seatbelt.Commands.PrivEsc
                     // access denied or other error - skip
                 }
             }
+
+            foreach (var r in results) yield return r;
         }
 
         internal class ModifiableServiceDTO : CommandDTOBase

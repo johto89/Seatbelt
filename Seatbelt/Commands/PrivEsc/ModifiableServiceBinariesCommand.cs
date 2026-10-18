@@ -22,6 +22,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override IEnumerable<CommandDTOBase?> Execute(string[] args)
         {
             ManagementObjectSearcher wmiData = null;
+            var results = new List<CommandDTOBase?>();
             try
             {
                 wmiData = new ManagementObjectSearcher(@"root\cimv2", "SELECT * FROM win32_service");
@@ -37,14 +38,14 @@ namespace Seatbelt.Commands.PrivEsc
 
                         if (SharpUpUtil.CheckModifiableAccess(binaryPath))
                         {
-                            yield return new ModifiableServiceBinaryDTO
+                            results.Add(new ModifiableServiceBinaryDTO
                             {
                                 ServiceName = result["Name"]?.ToString() ?? "(unknown)",
                                 State = result["State"]?.ToString() ?? "(unknown)",
                                 StartMode = result["StartMode"]?.ToString() ?? "(unknown)",
                                 PathName = result["PathName"]?.ToString() ?? "(unknown)",
                                 IsVulnerable = true
-                            };
+                            });
                         }
                     }
                 }
@@ -57,6 +58,8 @@ namespace Seatbelt.Commands.PrivEsc
             {
                 wmiData?.Dispose();
             }
+
+            foreach (var r in results) yield return r;
         }
 
         internal class ModifiableServiceBinaryDTO : CommandDTOBase

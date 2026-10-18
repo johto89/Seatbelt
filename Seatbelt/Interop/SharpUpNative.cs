@@ -79,12 +79,14 @@ namespace Seatbelt.Interop
             public SID_AND_ATTRIBUTES[] Groups;
         }
 
+#pragma warning disable 0649
         public struct TOKEN_PRIVILEGES
         {
             public UInt32 PrivilegeCount;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 35)]
             public LUID_AND_ATTRIBUTES[] Privileges;
         }
+#pragma warning restore 0649
 
         [StructLayout(LayoutKind.Sequential)]
         public struct LUID_AND_ATTRIBUTES

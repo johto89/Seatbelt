@@ -21,6 +21,7 @@ namespace Seatbelt.Commands.PrivEsc
 
         public override IEnumerable<CommandDTOBase?> Execute(string[] args)
         {
+            var results = new List<CommandDTOBase?>();
             try
             {
                 string autoAdminLogon = Runtime.GetStringValue(RegistryHive.LocalMachine, RegWinlogon, "AutoAdminLogon");
@@ -36,7 +37,7 @@ namespace Seatbelt.Commands.PrivEsc
 
                     if (!string.IsNullOrEmpty(defaultUser) || !string.IsNullOrEmpty(altUser))
                     {
-                        yield return new RegistryAutoLogonDTO
+                        results.Add(new RegistryAutoLogonDTO
                         {
                             DefaultDomainName = defaultDomain,
                             DefaultUserName = defaultUser,
@@ -45,17 +46,21 @@ namespace Seatbelt.Commands.PrivEsc
                             AltDefaultUserName = altUser,
                             AltDefaultPassword = altPass,
                             IsVulnerable = true
-                        };
-                        yield break;
+                        });
                     }
                 }
 
-                yield return new RegistryAutoLogonDTO { IsVulnerable = false };
+                if (results.Count == 0)
+                {
+                    results.Add(new RegistryAutoLogonDTO { IsVulnerable = false });
+                }
             }
             catch (Exception ex)
             {
                 WriteError(string.Format("  [X] Exception: {0}", ex.Message));
             }
+
+            foreach (var r in results) yield return r;
         }
 
         internal class RegistryAutoLogonDTO : CommandDTOBase

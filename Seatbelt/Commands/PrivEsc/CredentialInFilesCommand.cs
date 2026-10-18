@@ -75,6 +75,7 @@ namespace Seatbelt.Commands.PrivEsc
             }
 
             var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var credResults = new List<CommandDTOBase?>();
 
             foreach (string root in searchDirs)
             {
@@ -106,12 +107,12 @@ namespace Seatbelt.Commands.PrivEsc
                                     string snippet = m.Value;
                                     if (snippet.Length > 120) snippet = snippet.Substring(0, 120) + "...";
 
-                                    yield return new CredentialFileDTO
+                                    credResults.Add(new CredentialFileDTO
                                     {
                                         FilePath = file,
                                         MatchSnippet = snippet,
                                         IsVulnerable = true
-                                    };
+                                    });
                                     break; // one match per file is enough
                                 }
                             }
@@ -120,6 +121,8 @@ namespace Seatbelt.Commands.PrivEsc
                     }
                 }
             }
+
+            foreach (var r in credResults) yield return r;
         }
 
         private static List<string> RecursiveFindFiles(string path, string pattern, int maxDepth)

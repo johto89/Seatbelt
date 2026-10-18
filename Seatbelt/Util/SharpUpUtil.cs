@@ -344,7 +344,7 @@ namespace Seatbelt.Util
             return false;
         }
 
-        internal static string[] GetTokenGroupSIDs()
+        internal static string[]? GetTokenGroupSIDs()
         {
             int tokenInfLength = 0;
             bool result = Interop.SharpUpNative.GetTokenInformation(

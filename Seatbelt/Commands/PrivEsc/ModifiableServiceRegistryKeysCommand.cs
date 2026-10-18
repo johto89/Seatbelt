@@ -33,6 +33,7 @@ namespace Seatbelt.Commands.PrivEsc
                 yield break;
             }
 
+            var results = new List<CommandDTOBase?>();
             foreach (ServiceController sc in scServices)
             {
                 try
@@ -50,14 +51,14 @@ namespace Seatbelt.Commands.PrivEsc
 
                             foreach (ManagementObject result in data)
                             {
-                                yield return new ModifiableServiceRegKeyDTO
+                                results.Add(new ModifiableServiceRegKeyDTO
                                 {
                                     ServiceName = result["Name"]?.ToString() ?? sc.ServiceName,
                                     State = result["State"]?.ToString() ?? "(unknown)",
                                     StartMode = result["StartMode"]?.ToString() ?? "(unknown)",
                                     RegistryKeyPath = keyPath,
                                     IsVulnerable = true
-                                };
+                                });
                             }
                         }
                         finally
@@ -71,6 +72,8 @@ namespace Seatbelt.Commands.PrivEsc
                     // access denied or other error - skip this service
                 }
             }
+
+            foreach (var r in results) yield return r;
         }
 
         internal class ModifiableServiceRegKeyDTO : CommandDTOBase

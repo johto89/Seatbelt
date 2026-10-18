@@ -31,6 +31,7 @@ namespace Seatbelt.Commands.PrivEsc
             };
 
             bool found = false;
+            var results = new List<CommandDTOBase?>();
             foreach (string location in searchLocations)
             {
                 try
@@ -39,11 +40,11 @@ namespace Seatbelt.Commands.PrivEsc
                     foreach (string file in files)
                     {
                         found = true;
-                        yield return new McAfeeSitelistDTO
+                        results.Add(new McAfeeSitelistDTO
                         {
                             FilePath = file,
                             IsVulnerable = true
-                        };
+                        });
                     }
                 }
                 catch (Exception)
@@ -54,12 +55,14 @@ namespace Seatbelt.Commands.PrivEsc
 
             if (!found)
             {
-                yield return new McAfeeSitelistDTO
+                results.Add(new McAfeeSitelistDTO
                 {
                     FilePath = "(none found)",
                     IsVulnerable = false
-                };
+                });
             }
+
+            foreach (var r in results) yield return r;
         }
 
         internal class McAfeeSitelistDTO : CommandDTOBase
