@@ -10,6 +10,7 @@ namespace Seatbelt.Commands
         public abstract string Description { get; }
         public abstract CommandGroup[] Group { get; }
         public abstract bool SupportRemote { get; }
+        public virtual SeverityLevel Severity => SeverityLevel.Info;
 
         public Runtime Runtime { get; set; }
 

@@ -15,6 +15,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp+] Hunts for cleartext credentials in web.config, appsettings.json, .ini, and script files";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.Medium;
 
         // Patterns that indicate credential presence
         private static readonly Regex[] CredPatterns = new[]

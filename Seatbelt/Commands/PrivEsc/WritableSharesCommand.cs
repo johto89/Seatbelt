@@ -17,6 +17,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp+] Checks common shared/programdata directories for write access";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.Low;
 
         public WritableSharesCommand(Runtime runtime) : base(runtime) { }
 

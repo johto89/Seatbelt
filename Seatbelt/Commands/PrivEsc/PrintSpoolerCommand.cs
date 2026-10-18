@@ -16,6 +16,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp+] Checks if Print Spooler is running and misconfigured (PrintNightmare/SpoolFool)";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.Low;
 
         public PrintSpoolerCommand(Runtime runtime) : base(runtime) { }
 

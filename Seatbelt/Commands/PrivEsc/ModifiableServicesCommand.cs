@@ -20,6 +20,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp] Checks for services the current user can modify (change config, write DAC, etc.)";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.Critical;
 
         public ModifiableServicesCommand(Runtime runtime) : base(runtime) { }
 

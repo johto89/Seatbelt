@@ -17,6 +17,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp+] Checks for services whose binary directories are writable (enables DLL side-loading/planting)";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.High;
 
         public WritableServiceDirCommand(Runtime runtime) : base(runtime) { }
 

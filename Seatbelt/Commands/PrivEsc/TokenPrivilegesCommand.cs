@@ -16,6 +16,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp] Checks for abusable token privileges (SeImpersonate, SeDebug, etc.)";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.High;
 
         private static readonly string[] SpecialPrivileges =
         {

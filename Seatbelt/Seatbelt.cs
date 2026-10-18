@@ -2,6 +2,7 @@ using Seatbelt.Commands;
 using Seatbelt.Output.Sinks;
 using Seatbelt.Output.TextWriters;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -22,6 +23,8 @@ namespace Seatbelt
 
             _outputSink = OutputSinkFromArgs(Options.OutputFile);
 
+            SeverityLevel? maxSeverity = ParseSeverityFilter(Options.SeverityFilter);
+
             _runtime = new Runtime(
                 _outputSink,
                 Options.Commands,
@@ -31,7 +34,8 @@ namespace Seatbelt
                 Options.DelayCommands,
                 Options.ComputerName,
                 Options.UserName,
-                Options.Password
+                Options.Password,
+                maxSeverity
                 );
         }
 
@@ -172,7 +176,40 @@ namespace Seatbelt
             _outputSink.WriteHost("    'Seatbelt.exe -group=remote -computername=COMPUTER.DOMAIN.COM [-username=DOMAIN\\USER -password=PASSWORD]' will run remote specific checks");
             _outputSink.WriteHost("    'Seatbelt.exe -group=system -outputfile=\"C:\\Temp\\out.txt\"' will run system checks and output to a .txt file.");
             _outputSink.WriteHost("    'Seatbelt.exe -group=user -q -outputfile=\"C:\\Temp\\out.json\"' will run in quiet mode with user checks and output to a .json file.");
+            _outputSink.WriteHost("\n\n  PrivEsc Severity Filtering:");
+            _outputSink.WriteHost("    'Seatbelt.exe -group=privesc -Severity=critical'            runs only CRITICAL privesc checks");
+            _outputSink.WriteHost("    'Seatbelt.exe -group=privesc -Severity=critical,high'       runs CRITICAL and HIGH privesc checks");
+            _outputSink.WriteHost("    'Seatbelt.exe -group=privesc -Severity=critical,high,medium' runs CRITICAL, HIGH, and MEDIUM checks");
 
+        }
+
+        private static SeverityLevel? ParseSeverityFilter(string? severityArg)
+        {
+            if (string.IsNullOrEmpty(severityArg))
+                return null;
+
+            // Parse comma-separated severity levels, find the lowest priority (highest enum value)
+            // e.g., "critical,high" means show Critical and High → MaxSeverity = High
+            SeverityLevel maxLevel = SeverityLevel.Critical;
+
+            foreach (string part in severityArg.Split(','))
+            {
+                string trimmed = part.Trim().ToLower();
+                SeverityLevel parsed;
+                switch (trimmed)
+                {
+                    case "critical": parsed = SeverityLevel.Critical; break;
+                    case "high":     parsed = SeverityLevel.High; break;
+                    case "medium":   parsed = SeverityLevel.Medium; break;
+                    case "low":      parsed = SeverityLevel.Low; break;
+                    case "info":     parsed = SeverityLevel.Info; break;
+                    default: continue;
+                }
+                if (parsed > maxLevel)
+                    maxLevel = parsed;
+            }
+
+            return maxLevel;
         }
 
         public void Dispose()

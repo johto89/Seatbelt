@@ -14,6 +14,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp] Checks for services with unquoted paths that contain spaces";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.High;
 
         public UnquotedServicePathCommand(Runtime runtime) : base(runtime) { }
 

@@ -17,6 +17,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp+] Checks for COM objects vulnerable to hijacking (missing HKCU entries with writable/missing binaries)";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.Medium;
 
         // Well-known CLSIDs frequently abused for persistence/privesc
         private static readonly string[] TargetCLSIDs = new[]

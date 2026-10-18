@@ -14,6 +14,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp] Checks for registry AutoLogon credentials";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.Critical;
 
         private static readonly string RegWinlogon = @"Software\Microsoft\Windows NT\CurrentVersion\Winlogon";
 

@@ -17,6 +17,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp] Checks for scheduled tasks with modifiable target files";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.High;
 
         public ModifiableScheduledTaskFileCommand(Runtime runtime) : base(runtime) { }
 

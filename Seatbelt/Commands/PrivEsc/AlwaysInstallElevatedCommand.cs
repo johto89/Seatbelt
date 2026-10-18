@@ -13,6 +13,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp] Checks if AlwaysInstallElevated registry keys are set";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.Critical;
 
         public AlwaysInstallElevatedCommand(Runtime runtime) : base(runtime) { }
 

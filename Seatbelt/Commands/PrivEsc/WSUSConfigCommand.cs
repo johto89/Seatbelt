@@ -14,6 +14,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp+] Checks if WSUS is configured over HTTP (vulnerable to update injection via MITM)";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.Low;
 
         public WSUSConfigCommand(Runtime runtime) : base(runtime) { }
 

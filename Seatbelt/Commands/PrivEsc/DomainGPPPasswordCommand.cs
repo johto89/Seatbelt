@@ -14,6 +14,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp] Checks for GPP passwords in domain SYSVOL";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.Critical;
 
         public DomainGPPPasswordCommand(Runtime runtime) : base(runtime) { }
 

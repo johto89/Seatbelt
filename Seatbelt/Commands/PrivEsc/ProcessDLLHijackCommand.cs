@@ -16,6 +16,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp] Checks for writable DLLs loaded by running processes (not in KnownDlls or Windows dir)";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.Medium;
 
         private static readonly string RegPath = "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\KnownDlls";
 

@@ -29,6 +29,7 @@ namespace Seatbelt
                 var password = ParseAndRemoveKeyValueArgument("-Password");
 
                 var delayCommands = ParseAndRemoveKeyValueArgument("-DelayCommands");
+                var severityFilter = ParseAndRemoveKeyValueArgument("-Severity");
 
                 return new SeatbeltOptions(
                     Arguments.ToList(),      // Everything else that isn't parsed is interpreted as a command
@@ -40,7 +41,8 @@ namespace Seatbelt
                     delayCommands,
                     computerName,
                     userName,
-                    password
+                    password,
+                    severityFilter
                     );
             }
             finally

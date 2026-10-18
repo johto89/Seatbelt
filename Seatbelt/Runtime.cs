@@ -28,18 +28,20 @@ namespace Seatbelt
         private string UserName { get; }     // for remote connections
         private string Password { get; }     // for remote connections
         private ManagementClass wmiRegProv { get; }
+        public SeverityLevel? MaxSeverity { get; }  // severity filter: only show commands at or above this level
+        private Dictionary<SeverityLevel, int> _severityCounts = new Dictionary<SeverityLevel, int>();
 
         public Runtime(IOutputSink outputSink, IEnumerable<string> commands, IEnumerable<string> commandGroups, bool filter, string delayCommands, bool randomizeOrder)
-            : this(outputSink, commands, commandGroups, filter, randomizeOrder, delayCommands, "", "", "")
+            : this(outputSink, commands, commandGroups, filter, randomizeOrder, delayCommands, "", "", "", null)
         {
         }
 
         public Runtime(IOutputSink outputSink, IEnumerable<string> commands, IEnumerable<string> commandGroups, bool filter, string delayCommands, bool randomizeOrder, string computerName)
-            : this(outputSink, commands, commandGroups, filter, randomizeOrder, delayCommands, computerName, "", "")
+            : this(outputSink, commands, commandGroups, filter, randomizeOrder, delayCommands, computerName, "", "", null)
         {
         }
 
-        public Runtime(IOutputSink outputSink, IEnumerable<string> commands, IEnumerable<string> commandGroups, bool filter, bool randomizeOrder, string delayCommands, string computerName, string userName, string password)
+        public Runtime(IOutputSink outputSink, IEnumerable<string> commands, IEnumerable<string> commandGroups, bool filter, bool randomizeOrder, string delayCommands, string computerName, string userName, string password, SeverityLevel? maxSeverity = null)
         {
             OutputSink = outputSink;
             Commands = commands;
@@ -50,6 +52,7 @@ namespace Seatbelt
             ComputerName = computerName;
             UserName = userName;
             Password = password;
+            MaxSeverity = maxSeverity;
 
             // test a remote connection first if a remote system is specified
             if (!string.IsNullOrEmpty(computerName))
@@ -283,6 +286,8 @@ namespace Seatbelt
 
         public void Execute()
         {
+            _severityCounts.Clear();
+
             foreach (var group in CommandGroups)
             {
                 if (!ProcessGroup(group))
@@ -306,6 +311,64 @@ namespace Seatbelt
 
                 }
             }
+
+            // Print severity summary if any PrivEsc commands were run
+            if (_severityCounts.Count > 0)
+            {
+                PrintSeveritySummary();
+            }
+        }
+
+        private bool ShouldSkipBySeverity(CommandBase command)
+        {
+            if (!MaxSeverity.HasValue) return false;
+            // Only filter PrivEsc commands - let other groups through
+            if (!command.Group.Contains(CommandGroup.PrivEsc)) return false;
+            return command.Severity > MaxSeverity.Value;
+        }
+
+        private void TrackSeverity(CommandBase command, bool hadResults)
+        {
+            if (!command.Group.Contains(CommandGroup.PrivEsc)) return;
+            if (!hadResults) return;
+
+            if (_severityCounts.ContainsKey(command.Severity))
+                _severityCounts[command.Severity]++;
+            else
+                _severityCounts[command.Severity] = 1;
+        }
+
+        private void PrintSeveritySummary()
+        {
+            OutputSink.WriteHost("\n====== PrivEsc Severity Summary ======\n");
+
+            var levels = new[] { SeverityLevel.Critical, SeverityLevel.High, SeverityLevel.Medium, SeverityLevel.Low, SeverityLevel.Info };
+            var labels = new[] { "[!!!] CRITICAL", "[!!]  HIGH", "[!]   MEDIUM", "[*]   LOW", "[.]   INFO" };
+
+            int totalFindings = 0;
+            for (int i = 0; i < levels.Length; i++)
+            {
+                int count = _severityCounts.ContainsKey(levels[i]) ? _severityCounts[levels[i]] : 0;
+                totalFindings += count;
+                if (count > 0)
+                {
+                    OutputSink.WriteHost($"  {labels[i]}: {count} finding(s)");
+                }
+                else
+                {
+                    OutputSink.WriteHost($"  {labels[i]}: 0");
+                }
+            }
+
+            OutputSink.WriteHost($"\n  Total PrivEsc findings: {totalFindings}");
+
+            if (MaxSeverity.HasValue)
+            {
+                OutputSink.WriteHost($"  (Filtered to {MaxSeverity.Value} and above)");
+            }
+
+            OutputSink.WriteHost("\n  Tip: Use -Severity=critical,high to show only Critical+High findings");
+            OutputSink.WriteHost("  Tip: Use -OutputFile=results.txt to save full output to file\n");
         }
 
 
@@ -355,12 +418,31 @@ namespace Seatbelt
 
             var commandsFiltered = toExecute.Where(c => !toExclude.Contains(c)).ToList();
 
+            // Apply severity filter for PrivEsc commands
+            if (MaxSeverity.HasValue)
+            {
+                commandsFiltered = commandsFiltered.Where(c => !ShouldSkipBySeverity(c)).ToList();
+            }
+
             if (RandomizeOrder)
             {
                 OutputSink.WriteHost("[*] Order of the group's commands will be randomize\n");
 
                 RNGCryptoServiceProvider random = new RNGCryptoServiceProvider();
                 commandsFiltered = commandsFiltered.OrderBy(x => Next(random)).ToList();
+            }
+            else
+            {
+                // Sort PrivEsc commands by severity (Critical first) when not randomized
+                bool hasPrivEsc = commandsFiltered.Any(c => c.Group.Contains(CommandGroup.PrivEsc));
+                if (hasPrivEsc)
+                {
+                    commandsFiltered = commandsFiltered
+                        .OrderBy(c => c.Group.Contains(CommandGroup.PrivEsc) ? 0 : 1)
+                        .ThenBy(c => (int)c.Severity)
+                        .ThenBy(c => c.Command)
+                        .ToList();
+                }
             }
 
             commandsFiltered.ForEach(c =>
@@ -405,25 +487,53 @@ namespace Seatbelt
                     Thread.Sleep(Int32.Parse(DelayCommands));
                 }
 
-                OutputSink.WriteOutput(new HostDTO($"====== {command.Command} ======\n"));
+                // Show severity tag for PrivEsc commands
+                bool isPrivEsc = command.Group.Contains(CommandGroup.PrivEsc);
+                if (isPrivEsc)
+                {
+                    string severityTag = GetSeverityTag(command.Severity);
+                    OutputSink.WriteOutput(new HostDTO($"====== {command.Command} {severityTag} ======\n"));
+                }
+                else
+                {
+                    OutputSink.WriteOutput(new HostDTO($"====== {command.Command} ======\n"));
+                }
+
                 var results = command.Execute(commandArgs);
+                bool hadResults = false;
                 if (results != null)
                 {
-                    // OutputSink.BeginOutput();
                     foreach (var result in results)
                     {
                         // pass the command version from the command module to the DTO
                         result.SetCommandVersion(command.CommandVersion);
 
                         OutputSink.WriteOutput(result);
+                        hadResults = true;
                     }
-                    // OutputSink.EndOutput();
+                }
+
+                if (isPrivEsc)
+                {
+                    TrackSeverity(command, hadResults);
                 }
             }
             catch (Exception e)
             {
                 // TODO: Return an error DTO
                 OutputSink.WriteError($"  [!] Terminating exception running command '{command.Command}': " + e);
+            }
+        }
+
+        private static string GetSeverityTag(SeverityLevel level)
+        {
+            switch (level)
+            {
+                case SeverityLevel.Critical: return "[CRITICAL]";
+                case SeverityLevel.High:     return "[HIGH]";
+                case SeverityLevel.Medium:   return "[MEDIUM]";
+                case SeverityLevel.Low:      return "[LOW]";
+                default:                     return "[INFO]";
             }
         }
 

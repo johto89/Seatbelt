@@ -16,6 +16,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp+] Lists shadow copies and checks if SAM/SYSTEM/SECURITY are accessible through them";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.High;
 
         private static readonly string[] SensitiveHives = new[]
         {

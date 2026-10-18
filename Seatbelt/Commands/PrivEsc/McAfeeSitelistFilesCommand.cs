@@ -14,6 +14,7 @@ namespace Seatbelt.Commands.PrivEsc
         public override string Description => "[SharpUp] Checks for McAfee SiteList.xml files containing credentials";
         public override CommandGroup[] Group => new[] { CommandGroup.PrivEsc };
         public override bool SupportRemote => false;
+        public override SeverityLevel Severity => SeverityLevel.Medium;
 
         public McAfeeSitelistFilesCommand(Runtime runtime) : base(runtime) { }
 

@@ -4,7 +4,7 @@ namespace Seatbelt
 {
     class SeatbeltOptions
     {
-        public SeatbeltOptions(IEnumerable<string> commands, IEnumerable<string> commandGroup, string? outputFile, bool filterResults, bool quietMode, bool randomizeOrder, string? delayCommands, string? computerName, string? userName, string? password)
+        public SeatbeltOptions(IEnumerable<string> commands, IEnumerable<string> commandGroup, string? outputFile, bool filterResults, bool quietMode, bool randomizeOrder, string? delayCommands, string? computerName, string? userName, string? password, string? severityFilter = null)
         {
             Commands = commands;
             CommandGroups = commandGroup;
@@ -16,6 +16,7 @@ namespace Seatbelt
             ComputerName = computerName;
             UserName = userName;
             Password = password;
+            SeverityFilter = severityFilter;
         }
 
         public IEnumerable<string> Commands { get; set; }
@@ -28,5 +29,6 @@ namespace Seatbelt
         public string? ComputerName { get; set; }
         public string? UserName { get; set; }
         public string? Password { get; set; }
+        public string? SeverityFilter { get; set; }
     }
 }
