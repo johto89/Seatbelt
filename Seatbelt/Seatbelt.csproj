@@ -261,6 +261,13 @@
     <Compile Include="Commands\PrivEsc\TokenPrivilegesCommand.cs" />
     <Compile Include="Commands\PrivEsc\UnattendedInstallFilesCommand.cs" />
     <Compile Include="Commands\PrivEsc\UnquotedServicePathCommand.cs" />
+    <Compile Include="Commands\PrivEsc\CredentialInFilesCommand.cs" />
+    <Compile Include="Commands\PrivEsc\COMHijackCommand.cs" />
+    <Compile Include="Commands\PrivEsc\PrintSpoolerCommand.cs" />
+    <Compile Include="Commands\PrivEsc\WSUSConfigCommand.cs" />
+    <Compile Include="Commands\PrivEsc\ShadowCopyCommand.cs" />
+    <Compile Include="Commands\PrivEsc\WritableServiceDirCommand.cs" />
+    <Compile Include="Commands\PrivEsc\WritableSharesCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
