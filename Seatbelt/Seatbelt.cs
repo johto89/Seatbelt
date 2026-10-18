@@ -192,7 +192,7 @@ namespace Seatbelt
             // e.g., "critical,high" means show Critical and High → MaxSeverity = High
             SeverityLevel maxLevel = SeverityLevel.Critical;
 
-            foreach (string part in severityArg.Split(','))
+            foreach (string part in severityArg!.Split(','))
             {
                 string trimmed = part.Trim().ToLower();
                 SeverityLevel parsed;
