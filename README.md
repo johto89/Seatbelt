@@ -20,6 +20,7 @@ Seatbelt is licensed under the BSD 3-Clause license.
     + [system](#system)
     + [user](#user)
     + [misc](#misc)
+    + [privesc](#privesc)
     + [Additional Command Groups](#additional-command-groups)
   * [Command Arguments](#command-arguments)
   * [Output](#output)
@@ -165,8 +166,32 @@ Available commands (+ means remote usage is supported):
       WMIFilterBinding       - Lists WMI Filter to Consumer Bindings
     + WSUS                   - Windows Server Update Services (WSUS) settings, if applicable
 
+    --- PrivEsc Commands (integrated from SharpUp + extended checks) ---
+      SharpUpAlwaysInstallElevated      - Checks AlwaysInstallElevated registry keys
+      SharpUpCachedGPPPassword          - Finds cached Group Policy Preference passwords
+      SharpUpCOMHijack                  - Checks for COM objects vulnerable to hijacking
+      SharpUpCredentialFiles            - Hunts cleartext credentials in config files (web.config, appsettings, .ini)
+      SharpUpDomainGPPPassword          - Finds domain SYSVOL Group Policy Preference passwords
+      SharpUpHijackablePaths            - Checks system PATH for modifiable directories
+      SharpUpMcAfeeSitelistFiles        - Finds McAfee SiteList.xml files
+      SharpUpModifiableScheduledTaskFile - Checks for writable scheduled task files/binaries
+      SharpUpModifiableServiceBinaries  - Checks for modifiable service binaries
+      SharpUpModifiableServiceRegistryKeys - Checks for modifiable service registry keys
+      SharpUpModifiableServices         - Checks for services with modifiable DACLs
+      SharpUpPrintSpooler               - Checks Print Spooler config (PrintNightmare/SpoolFool)
+      SharpUpProcessDLLHijack           - Checks for DLL hijack opportunities in running processes
+      SharpUpRegistryAutoLogons         - Checks for registry autologon credentials
+      SharpUpRegistryAutoruns           - Checks for modifiable autorun binaries
+      SharpUpShadowCopies               - Lists shadow copies with accessible SAM/SYSTEM/ntds.dit
+      SharpUpTokenPrivileges            - Enumerates abusable token privileges
+      SharpUpUnattendedInstallFiles     - Checks for unattended installation files
+      SharpUpUnquotedServicePath        - Checks for unquoted service paths with spaces
+      SharpUpWSUSConfig                 - Checks if WSUS is configured over HTTP
+      SharpUpWritableServiceDir         - Checks for writable service binary directories
+      SharpUpWritableShares             - Checks common shared directories for write access
 
-Seatbelt has the following command groups: All, User, System, Slack, Chromium, Remote, Misc
+
+Seatbelt has the following command groups: All, User, System, Slack, Chromium, Remote, Misc, PrivEsc
 
     You can invoke command groups with         "Seatbelt.exe <group>"
 
@@ -234,6 +259,17 @@ Seatbelt has the following command groups: All, User, System, Slack, Chromium, R
         Printers, ProcessCreationEvents, ProcessOwners, RecycleBin, 
         reg, RPCMappedEndpoints, ScheduledTasks, SearchIndex, 
         SecurityPackages, SysmonEvents
+
+   "Seatbelt.exe -group=privesc" runs the following commands:
+
+        SharpUpAlwaysInstallElevated, SharpUpCachedGPPPassword, SharpUpCOMHijack,
+        SharpUpCredentialFiles, SharpUpDomainGPPPassword, SharpUpHijackablePaths,
+        SharpUpMcAfeeSitelistFiles, SharpUpModifiableScheduledTaskFile,
+        SharpUpModifiableServiceBinaries, SharpUpModifiableServiceRegistryKeys,
+        SharpUpModifiableServices, SharpUpPrintSpooler, SharpUpProcessDLLHijack,
+        SharpUpRegistryAutoLogons, SharpUpRegistryAutoruns, SharpUpShadowCopies,
+        SharpUpTokenPrivileges, SharpUpUnattendedInstallFiles, SharpUpUnquotedServicePath,
+        SharpUpWSUSConfig, SharpUpWritableServiceDir, SharpUpWritableShares
 
 
 Examples:
@@ -401,6 +437,38 @@ Executed with: `Seatbelt.exe -group=misc`
 | SysmonEvents | Sysmon process creation logs (1) with sensitive data. |
 
 
+### privesc
+
+Runs privilege escalation checks integrated from [SharpUp](https://github.com/GhostPack/SharpUp) plus extended real-world red team checks. Covers service misconfigurations, credential hunting, DLL hijacking, COM hijacking, token abuse, PrintSpooler, WSUS, shadow copies, and writable directories.
+
+Executed with: `Seatbelt.exe -group=privesc`
+
+| Command | Description |
+| ----------- | ----------- |
+| SharpUpAlwaysInstallElevated | Checks AlwaysInstallElevated registry keys (HKLM + HKCU) |
+| SharpUpCachedGPPPassword | Finds cached Group Policy Preference passwords |
+| SharpUpCOMHijack | Checks for COM objects vulnerable to HKCU hijacking |
+| SharpUpCredentialFiles | Hunts cleartext credentials in web.config, appsettings.json, .ini, script files |
+| SharpUpDomainGPPPassword | Finds domain SYSVOL Group Policy Preference passwords |
+| SharpUpHijackablePaths | Checks system PATH directories for modifiable folders |
+| SharpUpMcAfeeSitelistFiles | Finds McAfee SiteList.xml files |
+| SharpUpModifiableScheduledTaskFile | Checks for writable scheduled task files and task binaries |
+| SharpUpModifiableServiceBinaries | Checks for modifiable service binary paths |
+| SharpUpModifiableServiceRegistryKeys | Checks for modifiable service registry keys |
+| SharpUpModifiableServices | Checks for services with modifiable DACLs (ChangeConfig, WriteDac, etc.) |
+| SharpUpPrintSpooler | Checks Print Spooler status and Point-and-Print config (PrintNightmare/SpoolFool) |
+| SharpUpProcessDLLHijack | Checks for DLL hijack opportunities in running processes (non-KnownDLL, writable) |
+| SharpUpRegistryAutoLogons | Checks Winlogon registry for autologon credentials |
+| SharpUpRegistryAutoruns | Checks 8 autorun registry locations for modifiable binaries |
+| SharpUpShadowCopies | Lists volume shadow copies and checks if SAM/SYSTEM/SECURITY/ntds.dit are accessible |
+| SharpUpTokenPrivileges | Enumerates abusable token privileges (SeImpersonate, SeDebug, SeBackup, etc.) |
+| SharpUpUnattendedInstallFiles | Checks for unattended installation files (sysprep, Panther, etc.) |
+| SharpUpUnquotedServicePath | Checks for unquoted service paths with spaces |
+| SharpUpWSUSConfig | Checks if WSUS is configured over HTTP (WSUSPect/SharpWSUS attack surface) |
+| SharpUpWritableServiceDir | Checks for writable service binary directories (DLL side-loading) |
+| SharpUpWritableShares | Checks common shared/ProgramData directories for write access |
+
+
 ### Additional Command Groups
 
 Executed with: `Seatbelt.exe -group=GROUPNAME`
@@ -410,6 +478,7 @@ Executed with: `Seatbelt.exe -group=GROUPNAME`
 | Slack | Runs modules that start with "Slack*" |
 | Chromium | Runs modules that start with "Chromium*" |
 | Remote | Runs the following modules (for use against a remote system): AMSIProviders, AntiVirus, AuditPolicyRegistry, ChromiumPresence, CloudCredentials, DNSCache, DotNet, DpapiMasterKeys, EnvironmentVariables, ExplicitLogonEvents, ExplorerRunCommands, FileZilla, Hotfixes, InterestingProcesses, KeePass, LastShutdown, LocalGroups, LocalUsers, LogonEvents, LogonSessions, LSASettings, MappedDrives, NetworkProfiles, NetworkShares, NTLMSettings, OptionalFeatures, OSInfo, PoweredOnEvents, PowerShell, ProcessOwners, PSSessionSettings, PuttyHostKeys, PuttySessions, RDPSavedConnections, RDPSessions, RDPsettings, Sysmon, WindowsDefender, WindowsEventForwarding, WindowsFirewall |
+| PrivEsc | Runs all privilege escalation checks (SharpUp + extended): SharpUpAlwaysInstallElevated, SharpUpCachedGPPPassword, SharpUpCOMHijack, SharpUpCredentialFiles, SharpUpDomainGPPPassword, SharpUpHijackablePaths, SharpUpMcAfeeSitelistFiles, SharpUpModifiableScheduledTaskFile, SharpUpModifiableServiceBinaries, SharpUpModifiableServiceRegistryKeys, SharpUpModifiableServices, SharpUpPrintSpooler, SharpUpProcessDLLHijack, SharpUpRegistryAutoLogons, SharpUpRegistryAutoruns, SharpUpShadowCopies, SharpUpTokenPrivileges, SharpUpUnattendedInstallFiles, SharpUpUnquotedServicePath, SharpUpWSUSConfig, SharpUpWritableServiceDir, SharpUpWritableShares |
 
 
 ## Command Arguments
@@ -464,6 +533,7 @@ Seatbelt has been built against .NET 3.5 and 4.0 with C# 8.0 features and is com
 Seatbelt incorporates various collection items, code C# snippets, and bits of PoCs found throughout research for its capabilities. These ideas, snippets, and authors are highlighted in the appropriate locations in the source code, and include:
 
 * [@andrewchiles](https://twitter.com/andrewchiles)' [HostEnum.ps1](https://github.com/threatexpress/red-team-scripts/blob/master/HostEnum.ps1) script and [@tifkin\_](https://twitter.com/tifkin_)'s [Get-HostProfile.ps1](https://github.com/leechristensen/Random/blob/master/PowerShellScripts/Get-HostProfile.ps1) provided inspiration for many of the artifacts to collect.
+* [@harmj0y](https://twitter.com/harmj0y)'s [SharpUp](https://github.com/GhostPack/SharpUp) project — privilege escalation checks ported and extended as the PrivEsc command group, BSD 3-Clause
 * [Boboes' code concerning NetLocalGroupGetMembers](https://stackoverflow.com/questions/33935825/pinvoke-netlocalgroupgetmembers-runs-into-fatalexecutionengineerror/33939889#33939889)
 * [ambyte's code for converting a mapped drive letter to a network path](https://gist.github.com/ambyte/01664dc7ee576f69042c)
 * [Igor Korkhov's code to retrieve current token group information](https://stackoverflow.com/questions/2146153/how-to-get-the-logon-sid-in-c-sharp/2146418#2146418)
