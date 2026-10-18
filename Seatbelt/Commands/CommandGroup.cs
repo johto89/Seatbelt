@@ -15,5 +15,6 @@ namespace Seatbelt.Commands
         Chromium,
         Remote,
         Misc,
+        PrivEsc,
     }
 }

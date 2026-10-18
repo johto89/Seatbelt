@@ -77,6 +77,8 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Security" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\CommandGroup.cs" />
@@ -242,6 +244,23 @@
     <Compile Include="Output\TextWriters\ITextWriter.cs" />
     <Compile Include="Output\Sinks\TextOutputSink.cs" />
     <Compile Include="Util\WMIUtil.cs" />
+    <Compile Include="Util\SharpUpUtil.cs" />
+    <Compile Include="Interop\SharpUpNative.cs" />
+    <Compile Include="Commands\PrivEsc\AlwaysInstallElevatedCommand.cs" />
+    <Compile Include="Commands\PrivEsc\CachedGPPPasswordCommand.cs" />
+    <Compile Include="Commands\PrivEsc\DomainGPPPasswordCommand.cs" />
+    <Compile Include="Commands\PrivEsc\HijackablePathsCommand.cs" />
+    <Compile Include="Commands\PrivEsc\McAfeeSitelistFilesCommand.cs" />
+    <Compile Include="Commands\PrivEsc\ModifiableScheduledTaskFileCommand.cs" />
+    <Compile Include="Commands\PrivEsc\ModifiableServiceBinariesCommand.cs" />
+    <Compile Include="Commands\PrivEsc\ModifiableServiceRegistryKeysCommand.cs" />
+    <Compile Include="Commands\PrivEsc\ModifiableServicesCommand.cs" />
+    <Compile Include="Commands\PrivEsc\ProcessDLLHijackCommand.cs" />
+    <Compile Include="Commands\PrivEsc\RegistryAutoLogonsCommand.cs" />
+    <Compile Include="Commands\PrivEsc\RegistryAutorunsCommand.cs" />
+    <Compile Include="Commands\PrivEsc\TokenPrivilegesCommand.cs" />
+    <Compile Include="Commands\PrivEsc\UnattendedInstallFilesCommand.cs" />
+    <Compile Include="Commands\PrivEsc\UnquotedServicePathCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
